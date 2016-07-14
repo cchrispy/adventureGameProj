@@ -20,7 +20,9 @@ $(document).ready(function(){
       while ($('.line').length >= 27){
         $('.line').first()[0].remove();
       }
-      event(input);
+      if (input == 'begin' || events.begin){
+        event(input);
+      }
     }
   })
 })

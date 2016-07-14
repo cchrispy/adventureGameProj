@@ -47,16 +47,24 @@ function checkInput(input){
 function event(input){
   if (commandSpecs(input)){
     showSpecs(input);
+    return;
   }
-  else if (input == 'begin' && !events[input]){
-    events[input] = true;
-    logs.print('begin', 'start', 'line gray', [0,1]);
-    instr.print('examine', 'start', 'line gray', [0]);
+  if (input == 'begin' && !events.begin){
+    events.begin = true;
+    place = 'begin';
+    places.print(place, input, 'line gray', [0,1]);
+    instr.print('examine', 'line gray', [0]);
   }
-  else if (input == 'examine'){
-    logs.print('examine', 'start', 'line gray', [0]);
-    instr.print('inventory', 'start', 'line gray', [0]);
-    addInv('Dagger');
+  else if (input == 'walk'){
+    // change place
+    // print arrival from places;
+    // visited = false;
+    console.log('walked');
+  }
+  else if (checkInput(input)){
+    places.print(place, input, 'line gray', [0]);
+    instr.print('inventory', 'line gray', [0]);
+    addInv('Silver Dagger');
   }
   else {
     addLine('Error: unknown command.', 'line error');
