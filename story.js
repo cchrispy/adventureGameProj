@@ -1,17 +1,3 @@
-// function Instructions(){}
-// Instructions.prototype.print = function(action, classes, indeces){
-//   var obj = this;
-//   indeces.forEach(function(i){
-//     addLine(obj[action][i], classes);
-//   })
-// }
-// function Jungle(){};
-// Jungle.prototype.print = function(place, input, classes, indeces){
-//   var obj = this;
-//   indeces.forEach(function(i){
-//     addLine(obj[place][input][i], classes);
-//   })
-// }
 var $submit = $('#submit');
 var $jungle = $('#jungle');
 var $specs = $('#specs');
@@ -28,24 +14,44 @@ function print(obj, indeces, classes){
     addLine(obj[i], classes);
   })
 }
+function pickElement(list){
+  var i = Math.floor(Math.random()*list.length);
+  return list[i];
+}
+function pickLine(obj){
+  var list = [];
+  for (var prop in obj){
+    if (prop <= 50){
+      list.push(prop);
+    }
+  }
+  var i = [Number(pickElement(list))];
+  print(obj, i, 'logs');
+}
 
 logs.commands = ['commands/inv/char','examine/walk',
     'escape','slash']
 
 
 // places: empty, wraith, ghoul, items, shop
+
 logs.inv = {};
 logs.arrival = {};
 logs.examine = {};
+
 logs.begin = {
   0: "Welcome traveller...",
   1: "You find yourself in a dark place, dizzy and confused. " + 
      "There is blood on your hands, but it is not yours.",
   2: "You look around and find a dagger nearby."
-
 };
+
 logs.arrival.empty = {
-  0: "It is dark and desolate. You feel an uneasy presence."
+  0: "It is dark and desolate. You feel an uneasy presence.",
+  1: "You step into a grassy area. Ahead of you a crow squawks.",
+  2: "A silhouette appears in the darkness. You take a step closer " +
+     "to find a battered scarecrow.",
+  3: "You come across an overgrown tree stump."
 }
 logs.arrival.wraith = {
   0: "You hear a howl in the wind. A ghostly figure appears " +
@@ -60,12 +66,16 @@ logs.arrival.items = {
      "your attention."
 }
 logs.arrival.shop = {
-  0: "You stumble upon a cloaked man.",
-  1: "\"Welcome traveller, how's about a trade? Yes/No\""
+  0: "You stumble upon a cloaked man. " + 
+     "\"Welcome traveller, how's about a trade? Yes/No\""
 }
+
 logs.examine.empty = {
-  0: "The air is damp, a faint cry echoes in the distance. "+
-     "You find nothing interesting."
+  0: "The air is damp, a faint cry echoes in the distance.",
+  1: "A small animal scurries away.",
+  2: "You feel someone, or something, watching you. You glance " +
+     "over your shoulder and see nothing.",
+  99: "You look around and find nothing interesting."
 }
 
 instr.examine = {
@@ -84,17 +94,18 @@ instr.walk = {
   0: "Type \"walk\" to explore a different area."
 }
 
-places.begin = {
-  begin: logs.begin,
-  examine: logs.examine,
-  instr: instr.examine
-};
 places.empty = {
   arrival: function(){
-    print(logs.arrival.empty, [0], 'logs');
+    pickLine(logs.arrival.empty);
   },
   examine: function(){
-    print(logs.examine.empty, [0], 'logs');
+    if (!visited) {
+      pickLine(logs.examine.empty);
+      visited = true;
+    }
+    else {
+      print(logs.examine.empty, [99], 'logs');
+    }
   }
 };
 places.wraith = {
@@ -114,6 +125,6 @@ places.items = {
 };
 places.shop = {
   arrival: function(){
-    print(logs.arrival.shop, [1,2], 'logs');
+    print(logs.arrival.shop, [0], 'logs');
   }
 };

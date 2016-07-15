@@ -52,10 +52,10 @@ function checkInput(input){
   else {return false;}
 }
 
-function pickPlace(){
-  var i = Math.floor(Math.random()*places.list.length);
-  return places.list[i];
-}
+// function pickElement(list){
+//   var i = Math.floor(Math.random()*list.length);
+//   return list[i];
+// }
 
 function tutorial(input){
   if (input != 'begin' && !events.tutorial.begin){
@@ -93,7 +93,8 @@ function event(input){
     return;
   }
   else if (input == 'walk'){
-    place = pickPlace();
+    place = pickElement(places.list);
+    visited = false;
     places[place].arrival();
     // change place
     // print arrival from places;
