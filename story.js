@@ -1,33 +1,35 @@
-function Instructions(){}
-Instructions.prototype.print = function(action, classes, indeces){
-  var obj = this;
-  indeces.forEach(function(i){
-    addLine(obj[action][i], classes);
-  })
-}
-function Jungle(){};
-Jungle.prototype.print = function(place, input, classes, indeces){
-  var obj = this;
-  indeces.forEach(function(i){
-    addLine(obj[place][input][i], classes);
-  })
-}
+// function Instructions(){}
+// Instructions.prototype.print = function(action, classes, indeces){
+//   var obj = this;
+//   indeces.forEach(function(i){
+//     addLine(obj[action][i], classes);
+//   })
+// }
+// function Jungle(){};
+// Jungle.prototype.print = function(place, input, classes, indeces){
+//   var obj = this;
+//   indeces.forEach(function(i){
+//     addLine(obj[place][input][i], classes);
+//   })
+// }
 var $submit = $('#submit');
 var $jungle = $('#jungle');
 var $specs = $('#specs');
 var logs = {};
-var instr = new Instructions();
-var events = {};
-var places = new Jungle();
+var instr = {};
+var events = {tutorial: {}};
+var places = {};
 var place;
 var inputs = ['examine'];
 var visited;
 
-function print(obj, indeces){
+function print(obj, indeces, classes){
   indeces.forEach(function(i){
-    addLine(obj[i], 'line gray');
+    addLine(obj[i], classes);
   })
 }
+
+logs.commands = ['inv', 'char', 'walk']
 
 logs.begin = {
   0: "Welcome traveller...",
@@ -41,7 +43,9 @@ logs.arrival = {
   2: "There is a shuffling near the ground. Something catches " +
      "your attention.",
   3: "You stumble upon a cloaked man.",
-  4: "\"Welcome traveller, how's about a trade? Yes/No\""
+  4: "\"Welcome traveller, how's about a trade? Yes/No\"",
+  5: "A putrid smell fills the air. A creature snarls. " +
+     "It rushes towards you."
 }
 logs.examine = {
   0: "You look around and find a dagger nearby.",
@@ -55,32 +59,46 @@ instr.examine = {
 instr.inventory = {
   0: "Type \"inv\" to check your inventory."
 };
+instr.commands = {
+  0: "Type \"commands\" to view available commands."
+}
+instr.char = {
+  0: "Type \"char\" to view your stats."
+}
+instr.walk = {
+  0: "Type \"walk\" to explore a different area."
+}
 
 places.begin = {
-                begin: logs.begin,
-                examine: logs.examine,
-                instr: instr.examine
-              };
+  begin: logs.begin,
+  examine: logs.examine,
+  instr: instr.examine
+};
 places.empty = {
-                arrival: function(){
-                  print(logs.arrival, [0]);
-                },
-                examine: function(){
-                  print(logs.examine, [1]);
-                }
-              };
+  arrival: function(){
+    print(logs.arrival, [0], 'logs');
+  },
+  examine: function(){
+    print(logs.examine, [1], 'logs');
+  }
+};
 places.wraith = {
-                arrival: function(){
-                  print(logs.arrival, [1]);
-                }
-              };
+  arrival: function(){
+    print(logs.arrival, [1], 'enemy');
+  }
+};
+places.ghoul = {
+  arrival: function(){
+    print(logs.arrival, [5], 'enemy');
+  }
+}
 places.items = {
-                arrival: function(){
-                  print(logs.arrival, [2]);
-                }
-              };
+  arrival: function(){
+    print(logs.arrival, [2], 'logs');
+  }
+};
 places.shop = {
-                arrival: function(){
-                  print(logs.arrival, [3,4]);
-                }
-              };
+  arrival: function(){
+    print(logs.arrival, [3,4], 'logs');
+  }
+};

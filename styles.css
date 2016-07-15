@@ -55,3 +55,9 @@ p{
 #inv, #commands {
   display: none;
 }
+.logs {
+  color: #4a883a;
+}
+.enemy {
+  color: #8b3737;
+}

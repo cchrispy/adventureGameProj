@@ -1,5 +1,5 @@
 function addLine(input, classes){
-  $('<div>', {'class': classes}).text('> '+input).insertBefore($submit);
+  $('<div>', {'class': 'line ' + classes}).text('> '+input).insertBefore($submit);
   $('.line').first().css('margin-top', '15px');
 }
 function addInv(item){
@@ -10,6 +10,13 @@ function addInv(item){
     logs.inv[item]++;
   }
   $('<p>').text(item).appendTo($('#inv'));
+}
+
+function addCommand(command){
+  if (logs.commands.indexOf(command) != -1){
+    logs.commands.push(command);
+    $('<p>').text(command).appendTo($('#commands'));
+  }
 }
 
 function showSpecs(input){
@@ -44,29 +51,51 @@ function checkInput(input){
   }
 }
 
+function tutorial(input){
+  if (input != 'begin' && !events.tutorial.begin){
+    return;
+  }
+  if (input == 'begin' && !events.tutorial.begin){
+    events.tutorial.begin = true;
+    print(logs.begin, [0,1], 'logs');
+    print(instr.examine, [0], 'gray');
+  }
+  else if (input == 'examine' && events.tutorial.begin){
+    events.tutorial.examine = true;
+    print(logs.examine, [0], 'logs');
+    addInv("Silver Dagger");
+    print(instr.inventory, [0], 'gray');
+  }
+  else if (input == 'inv' && events.tutorial.examine){
+    events.tutorial.complete = true;
+    print(instr.commands, [0], 'gray');
+    print(instr.walk, [0], 'gray');
+    showSpecs(input);
+  }
+  else if (commandSpecs(input)){
+    showSpecs(input);
+  }
+  else {
+    addLine("Hm. Try again.", "error");
+  }
+}
+
 function event(input){
+  console.log(input);
   if (commandSpecs(input)){
     showSpecs(input);
     return;
-  }
-  if (input == 'begin' && !events.begin){
-    events.begin = true;
-    place = 'begin';
-    places.print(place, input, 'line gray', [0,1]);
-    instr.print('examine', 'line gray', [0]);
   }
   else if (input == 'walk'){
     // change place
     // print arrival from places;
     // visited = false;
-    console.log('walked');
   }
   else if (checkInput(input)){
-    places.print(place, input, 'line gray', [0]);
-    instr.print('inventory', 'line gray', [0]);
-    addInv('Silver Dagger');
+
   }
   else {
-    addLine('Error: unknown command.', 'line error');
+    addLine('Error: unknown command.', 'error');
   }
+  console.log(logs.inv);
 }

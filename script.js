@@ -1,5 +1,8 @@
 $(document).ready(function(){
   addInv('Gold Key');
+  logs.commands.forEach(function(command){
+    addCommand(command);
+  })
   $submit.on('focus', function(){
     if ($submit.val() == 'Command Line'){
       $submit.val('');
@@ -10,17 +13,20 @@ $(document).ready(function(){
       $submit.val('Command Line');
     }
   })
-  addLine('Type "begin" when you are ready', 'line');
-  addLine('', 'line');
+  addLine('Type "begin" when you are ready', '');
+  addLine('', '');
   $submit.on('keyup', function(key){
     if (key.keyCode == 13){
       var input = $submit.val().toLowerCase();
-      addLine(input, 'line');
+      addLine(input, '');
       $submit.val("");
       while ($('.line').length >= 27){
         $('.line').first()[0].remove();
       }
-      if (input == 'begin' || events.begin){
+      if (!events.tutorial.complete){
+        tutorial(input);
+      }
+      else {
         event(input);
       }
     }
