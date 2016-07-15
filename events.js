@@ -12,6 +12,11 @@ function addInv(item){
   $('<p>').text(item).appendTo($('#inv'));
 }
 
+function addWeapon(weapon, dmgRange){
+  weapons[weapon] = dmgRange;
+  addInv(weapon);
+}
+
 function addCommand(command){
   if (logs.commands.indexOf(command) != -1){
     logs.commands.push(command);
@@ -52,11 +57,6 @@ function checkInput(input){
   else {return false;}
 }
 
-// function pickElement(list){
-//   var i = Math.floor(Math.random()*list.length);
-//   return list[i];
-// }
-
 function tutorial(input){
   if (input != 'begin' && !events.tutorial.begin){
     return;
@@ -69,7 +69,7 @@ function tutorial(input){
   else if (input == 'examine' && events.tutorial.begin){
     events.tutorial.examine = true;
     print(logs.begin, [2], 'logs');
-    addInv("Silver Dagger");
+    addWeapon("Silver Dagger", range(6,8));
     print(instr.inventory, [0], 'gray');
   }
   else if (input == 'inv' && events.tutorial.examine){
@@ -86,19 +86,64 @@ function tutorial(input){
   }
 }
 
+places.empty = {
+  arrival: function(){
+    pickLine(logs.arrival.empty);
+  },
+  examine: function(){
+    if (!events.visited) {
+      pickLine(logs.examine.empty);
+      events.visited = true;
+    }
+    else {
+      print(logs.examine.empty, [99], 'logs');
+    }
+  }
+};
+places.wraith = {
+  arrival: function(){
+    print(logs.arrival.wraith, [0], 'enemy');
+    events.killed = false;
+    enemies.wraith.health = pickBetween(4,20);
+    enemies.wraith.dmg = range(1,1);
+    addLine('Enemy health: '+enemies.wraith.health, 'combat');
+  },
+  slash: function(){
+    logs.combat.slash('wraith', 'Silver Dagger');
+  }
+};
+places.ghoul = {
+  arrival: function(){
+    print(logs.arrival.ghoul, [0], 'enemy');
+    events.killed = false;
+    enemies.ghoul.health = pickBetween(4,6);
+    enemies.ghoul.dmg = range(1,1);
+    addLine('Enemy health: '+enemies.ghoul.health, 'combat')
+  },
+  slash: function(){
+    logs.combat.slash('ghoul', 'Silver Dagger');
+  }
+}
+places.items = {
+  arrival: function(){
+    print(logs.arrival.items, [0], 'logs');
+  }
+};
+places.shop = {
+  arrival: function(){
+    print(logs.arrival.shop, [0], 'logs');
+  }
+};
+
 function event(input){
-  console.log(input);
   if (commandSpecs(input)){
     showSpecs(input);
     return;
   }
   else if (input == 'walk'){
     place = pickElement(places.list);
-    visited = false;
+    events.visited = false;
     places[place].arrival();
-    // change place
-    // print arrival from places;
-    // visited = false;
   }
   else if (checkInput(input)){
     places[place][input]();
@@ -106,4 +151,5 @@ function event(input){
   else {
     addLine('Error: unknown command.', 'error');
   }
+  console.log(place);
 }

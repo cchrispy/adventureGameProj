@@ -4,7 +4,9 @@ $(document).ready(function(){
     addCommand(command);
   })
   places.list.push('empty','wraith','ghoul')
-  console.log(places);
+  $jungle.on('click', function(){
+    $submit.focus();
+  })
   $submit.on('focus', function(){
     if ($submit.val() == 'Command Line'){
       $submit.val('');
@@ -26,10 +28,17 @@ $(document).ready(function(){
       $('.line').each(function(){
         totalHeight += $(this).height();
       })
-      while (totalHeight >= 500){
+      while (totalHeight >= 460){
         var $firstLine = $('.line').first();
         totalHeight -= $firstLine.height();
         $firstLine[0].remove();
+      }
+      if ($('.line').length > 6){
+        var $line = $('.line');
+        $line.first().css('opacity', '0.5');
+        $line.first().next().css('opacity', '0.6');
+        $line.first().next().next().css('opacity', '0.7');
+        $line.first().next().next().next().css('opacity', '0.8');
       }
       if (!events.tutorial.complete){
         tutorial(input);

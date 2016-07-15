@@ -1,14 +1,42 @@
+function Enemy(name, verb){
+  this.name = name;
+  this.verb = verb;
+};
+Enemy.prototype.attack = function(){
+  var str = "The " + this.name + " " + this.verb + " you and inflicts " +
+            this.dmg + " damage.";
+  addLine(str, 'error');
+  var health = +$('#health').text();
+  $('#health').text(health-1);
+}
+Enemy.prototype.died = function(){
+  var str = "The " + this.name + " crumbles to the ground " +
+            "in a pile of ash and dust.";
+  addLine(str, 'combat');
+}
+
 var $submit = $('#submit');
 var $jungle = $('#jungle');
 var $specs = $('#specs');
 var logs = {};
 var instr = {};
-var events = {tutorial: {}};
+var events = {tutorial: {}, visited: false, killed: false};
 var places = {list: []};
 var place;
-var inputs = ['examine'];
-var visited;
+var weapons = {};
+var enemies = {
+  wraith: new Enemy('wraith', 'strikes'),
+  ghoul: new Enemy('ghoul', 'lunges at')
+};
+var inputs = ['examine','slash'];
 
+function range(a,b){
+  var arr = [];
+  for (var i=a; i<=b; i++){
+    arr.push(i);
+  }
+  return arr;
+}
 function print(obj, indeces, classes){
   indeces.forEach(function(i){
     addLine(obj[i], classes);
@@ -17,6 +45,9 @@ function print(obj, indeces, classes){
 function pickElement(list){
   var i = Math.floor(Math.random()*list.length);
   return list[i];
+}
+function pickBetween(a,b){
+  return pickElement(range(a,b));
 }
 function pickLine(obj){
   var list = [];
@@ -51,7 +82,8 @@ logs.arrival.empty = {
   1: "You step into a grassy area. Ahead of you a crow squawks.",
   2: "A silhouette appears in the darkness. You take a step closer " +
      "to find a battered scarecrow.",
-  3: "You come across an overgrown tree stump."
+  3: "You come across an overgrown tree stump.",
+  4: "The ground is damp. There is a metallic smell."
 }
 logs.arrival.wraith = {
   0: "You hear a howl in the wind. A ghostly figure appears " +
@@ -75,7 +107,33 @@ logs.examine.empty = {
   1: "A small animal scurries away.",
   2: "You feel someone, or something, watching you. You glance " +
      "over your shoulder and see nothing.",
+  3: "You look around and find nothing interesting.",
   99: "You look around and find nothing interesting."
+}
+
+logs.combat = {
+  slash: function(enemy, weapon){
+    var foe = enemies[enemy];
+    if (!events.killed){
+      var dmg = pickElement(weapons[weapon]);
+      var str = "You slash the " + enemy + " with your " + 
+                weapon + " and deal " + dmg + " damage.";
+      addLine(str, 'combat')
+      foe.health -= dmg;
+      if (foe.health < 1){
+        foe.died();
+        events.killed = true;
+      }
+      else {
+        foe.attack();
+        addLine('Enemy health: '+foe.health, 'combat');
+      }
+    }
+    else {
+      var str = "You swing your " + weapon + " in victory.";
+      addLine(str, 'combat');
+    }
+  }
 }
 
 instr.examine = {
@@ -94,37 +152,43 @@ instr.walk = {
   0: "Type \"walk\" to explore a different area."
 }
 
-places.empty = {
-  arrival: function(){
-    pickLine(logs.arrival.empty);
-  },
-  examine: function(){
-    if (!visited) {
-      pickLine(logs.examine.empty);
-      visited = true;
-    }
-    else {
-      print(logs.examine.empty, [99], 'logs');
-    }
-  }
-};
-places.wraith = {
-  arrival: function(){
-    print(logs.arrival.wraith, [0], 'enemy');
-  }
-};
-places.ghoul = {
-  arrival: function(){
-    print(logs.arrival.ghoul, [0], 'enemy');
-  }
-}
-places.items = {
-  arrival: function(){
-    print(logs.arrival.items, [0], 'logs');
-  }
-};
-places.shop = {
-  arrival: function(){
-    print(logs.arrival.shop, [0], 'logs');
-  }
-};
+// places.empty = {
+//   arrival: function(){
+//     pickLine(logs.arrival.empty);
+//   },
+//   examine: function(){
+//     if (!visited) {
+//       pickLine(logs.examine.empty);
+//       visited = true;
+//     }
+//     else {
+//       print(logs.examine.empty, [99], 'logs');
+//     }
+//   }
+// };
+// places.wraith = {
+//   arrival: function(){
+//     print(logs.arrival.wraith, [0], 'enemy');
+//   },
+//   slash: function(){
+//     logs.combat.slash('wraith', 'Silver Dagger');
+//   }
+// };
+// places.ghoul = {
+//   arrival: function(){
+//     print(logs.arrival.ghoul, [0], 'enemy');
+//   },
+//   slash: function(){
+//     logs.combat.slash('ghoul', 'Silver Dagger');
+//   }
+// }
+// places.items = {
+//   arrival: function(){
+//     print(logs.arrival.items, [0], 'logs');
+//   }
+// };
+// places.shop = {
+//   arrival: function(){
+//     print(logs.arrival.shop, [0], 'logs');
+//   }
+// };
