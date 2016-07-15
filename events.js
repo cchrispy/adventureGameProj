@@ -49,6 +49,12 @@ function checkInput(input){
   if (inputs.indexOf(input) != -1){
     return true;
   }
+  else {return false;}
+}
+
+function pickPlace(){
+  var i = Math.floor(Math.random()*places.list.length);
+  return places.list[i];
 }
 
 function tutorial(input){
@@ -87,15 +93,16 @@ function event(input){
     return;
   }
   else if (input == 'walk'){
+    place = pickPlace();
+    places[place].arrival();
     // change place
     // print arrival from places;
     // visited = false;
   }
   else if (checkInput(input)){
-
+    places[place][input]();
   }
   else {
     addLine('Error: unknown command.', 'error');
   }
-  console.log(logs.inv);
 }

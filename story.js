@@ -18,7 +18,7 @@ var $specs = $('#specs');
 var logs = {};
 var instr = {};
 var events = {tutorial: {}};
-var places = {};
+var places = {list: []};
 var place;
 var inputs = ['examine'];
 var visited;
@@ -29,8 +29,10 @@ function print(obj, indeces, classes){
   })
 }
 
-logs.commands = ['inv', 'char', 'walk']
+logs.commands = ['commands/inv/char','examine','walk',
+    'escape','slash']
 
+logs.inv = {};
 logs.begin = {
   0: "Welcome traveller...",
   1: "You find yourself in a dark place, dizzy and confused. " + 
@@ -52,7 +54,7 @@ logs.examine = {
   1: "The air is damp, a faint cry echoes in the distance. "+
      "You find nothing interesting."
 }
-logs.inv = {};
+
 instr.examine = {
   0: "Type \"examine\" to look around."
 };

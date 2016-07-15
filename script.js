@@ -3,6 +3,8 @@ $(document).ready(function(){
   logs.commands.forEach(function(command){
     addCommand(command);
   })
+  places.list.push('empty','wraith','ghoul')
+  console.log(places);
   $submit.on('focus', function(){
     if ($submit.val() == 'Command Line'){
       $submit.val('');
@@ -20,8 +22,14 @@ $(document).ready(function(){
       var input = $submit.val().toLowerCase();
       addLine(input, '');
       $submit.val("");
-      while ($('.line').length >= 27){
-        $('.line').first()[0].remove();
+      var totalHeight = 0;
+      $('.line').each(function(){
+        totalHeight += $(this).height();
+      })
+      while (totalHeight >= 500){
+        var $firstLine = $('.line').first();
+        totalHeight -= $firstLine.height();
+        $firstLine[0].remove();
       }
       if (!events.tutorial.complete){
         tutorial(input);
