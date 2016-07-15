@@ -68,7 +68,7 @@ function tutorial(input){
   }
   else if (input == 'examine' && events.tutorial.begin){
     events.tutorial.examine = true;
-    print(logs.examine, [0], 'logs');
+    print(logs.begin, [2], 'logs');
     addInv("Silver Dagger");
     print(instr.inventory, [0], 'gray');
   }
