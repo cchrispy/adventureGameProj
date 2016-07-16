@@ -103,25 +103,50 @@ places.empty = {
 places.wraith = {
   arrival: function(){
     print(logs.arrival.wraith, [0], 'enemy');
-    events.killed = false;
-    enemies.wraith.health = pickBetween(4,20);
+    enemies.wraith.health = pickBetween(4,10);
     enemies.wraith.dmg = range(1,1);
     addLine('Enemy health: '+enemies.wraith.health, 'combat');
   },
   slash: function(){
     logs.combat.slash('wraith', 'Silver Dagger');
+  },
+  examine: function(){
+    if (!events.killed){
+      var str = "The wraith lets out a blood curling shriek.";
+      addLine(str, 'combat');
+    }
+    else if (!events.visited){
+      enemies.wraith.examineDead('Shard', 0.2);
+      events.visited = true;
+    }
+    else {
+      print(logs.examine.empty, [99], 'logs');
+    }
   }
 };
 places.ghoul = {
   arrival: function(){
     print(logs.arrival.ghoul, [0], 'enemy');
-    events.killed = false;
-    enemies.ghoul.health = pickBetween(4,6);
+    enemies.ghoul.health = pickBetween(4,8);
     enemies.ghoul.dmg = range(1,1);
     addLine('Enemy health: '+enemies.ghoul.health, 'combat')
   },
   slash: function(){
     logs.combat.slash('ghoul', 'Silver Dagger');
+  },
+  examine: function(){
+    if (!events.killed){
+      var str = "The ghoul is small but vicious. " +
+                "Defend yourself!";
+      addLine(str, 'combat');
+    }
+    else if (!events.visited){
+      enemies.ghoul.examineDead('Shard', 0.2);
+      events.visited = true;
+    }
+    else {
+      print(logs.examine.empty, [99], 'logs');
+    }
   }
 }
 places.items = {
@@ -143,6 +168,7 @@ function event(input){
   else if (input == 'walk'){
     place = pickElement(places.list);
     events.visited = false;
+    events.killed = false;
     places[place].arrival();
   }
   else if (checkInput(input)){

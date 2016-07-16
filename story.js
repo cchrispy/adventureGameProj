@@ -14,6 +14,16 @@ Enemy.prototype.died = function(){
             "in a pile of ash and dust.";
   addLine(str, 'combat');
 }
+Enemy.prototype.examineDead = function(item, dropRate){
+  var rando = Math.random();
+  if (rando < dropRate){
+    print(logs.examine[item], [0], 'logs');
+    addInv(item);
+  }
+  else {
+    pickLine(logs.examine[this.name]);
+  }
+}
 
 var $submit = $('#submit');
 var $jungle = $('#jungle');
@@ -109,6 +119,15 @@ logs.examine.empty = {
      "over your shoulder and see nothing.",
   3: "You look around and find nothing interesting.",
   99: "You look around and find nothing interesting."
+}
+logs.examine.ghoul = {
+  0: "You feel weary and rest for a moment.",
+  1: "You dig through the remains and find nothing.",
+  2: "A gentle breeze blows the ashy remains away."
+}
+logs.examine.wraith = logs.examine.ghoul;
+logs.examine.Shard = {
+  0: "You find a shard in the ashy remains."
 }
 
 logs.combat = {
