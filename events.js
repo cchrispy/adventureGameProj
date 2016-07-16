@@ -5,12 +5,13 @@ function addLine(input, classes){
 function addInv(item){
   if (!logs.inv[item]){
     logs.inv[item] = 1;
-    $('<p>', {'id': item}).text('1 '+item).appendTo($('#inv'));
+    var $span = item+': '+'<span id='+item+'>1</span>';
+    $('<p>').append($span).appendTo($('#char'));
   }
   else {
     logs.inv[item]++;
     var id = '#'+item;
-    $(id).text(logs.inv[item]+' '+item);
+    $(id).text(logs.inv[item]);
   }
 }
 
@@ -34,9 +35,6 @@ function showSpecs(input){
     case 'char':
       $type = $('#char');
       break;
-    case 'inv':
-      $type = $('#inv');
-      break;
     case 'commands':
       $type = $('#commands');
       break;
@@ -48,7 +46,7 @@ function showSpecs(input){
 }
 
 function commandSpecs(input){
-  if (input == 'char' || input == 'inv' || input == 'commands'){
+  if (input == 'char' || input == 'commands'){
     return true;
   }
   else {return false;}
@@ -74,11 +72,12 @@ function tutorial(input){
     events.tutorial.examine = true;
     print(logs.begin, [2], 'logs');
     addWeapon("Silver Dagger", range(6,8));
-    print(instr.inventory, [0], 'gray');
-  }
-  else if (input == 'inv' && events.tutorial.examine){
-    events.tutorial.complete = true;
+
     print(instr.commands, [0], 'gray');
+  }
+  else if (input == 'commands' && events.tutorial.examine){
+    events.tutorial.complete = true;
+    // print(instr.commands, [0], 'gray');
     print(instr.char, [0], 'gray');
     print(instr.walk, [0], 'gray');
     showSpecs(input);
@@ -108,6 +107,10 @@ places.empty = {
 places.item = {
   arrival: function(){
     pickLine(logs.arrival.item);
+    if (!events.hints.examine){
+      print(instr.examine, [1], 'gray');
+      events.hints.examine = true;
+    }
   },
   examine: function(){
     if (!events.visited){
@@ -122,10 +125,11 @@ places.item = {
 }
 places.wraith = {
   arrival: function(){
-    print(logs.arrival.wraith, [0], 'enemy');
-    enemies.wraith.health = pickBetween(4,10);
-    enemies.wraith.dmg = pickBetween(1,1);
-    addLine('Enemy health: '+enemies.wraith.health, 'combat');
+    enemies.wraith.arrival([4,10], [1,1]);
+    if (!events.hints.combat){
+      print(instr["Silver Dagger"], [1], 'gray');
+      events.hints.combat = true;
+    }
   },
   slash: function(){
     logs.combat.slash('wraith', 'Silver Dagger');
@@ -149,10 +153,11 @@ places.wraith = {
 };
 places.ghoul = {
   arrival: function(){
-    print(logs.arrival.ghoul, [0], 'enemy');
-    enemies.ghoul.health = pickBetween(4,8);
-    enemies.ghoul.dmg = pickBetween(1,1);
-    addLine('Enemy health: '+enemies.ghoul.health, 'combat')
+    enemies.ghoul.arrival([4,8], [1,1]);
+    if (!events.hints.combat){
+      print(instr["Silver Dagger"], [1], 'gray');
+      events.hints.combat = true;
+    }
   },
   slash: function(){
     logs.combat.slash('ghoul', 'Silver Dagger');
@@ -192,11 +197,17 @@ function event(input){
     return;
   }
   else if (input == 'walk'){
-    addLine("You continue walking..", 'logs');
-    place = pickElement(places.list);
-    events.visited = false;
-    events.killed = false;
-    places[place].arrival();
+    if (events.combat){
+      addLine('You can\'t walk away. Type "escape" to '+
+              'flee (2 stamina).', 'error');
+    }
+    else {
+      addLine("You continue walking..", 'logs');
+      place = pickElement(places.list);
+      events.visited = false;
+      events.killed = false;
+      places[place].arrival();
+    }
   }
   else if (checkInput(input)){
     if (input in places[place]){

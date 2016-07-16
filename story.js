@@ -2,6 +2,13 @@ function Enemy(name, verb){
   this.name = name;
   this.verb = verb;
 };
+Enemy.prototype.arrival = function(health, dmg){
+  events.combat = true;
+  pickLine(logs.arrival[this.name], 'enemy');
+  this.health = pickBetween.apply(null, health);
+  this.dmg = pickBetween.apply(null, dmg);
+  addLine('Enemy health: '+this.health, 'combat');
+}
 Enemy.prototype.attack = function(){
   var str = "The " + this.name + " " + this.verb + " you and inflicts " +
             this.dmg + " damage.";
@@ -18,6 +25,11 @@ Enemy.prototype.died = function(){
   addLine(str, 'combat');
   enemies.killed++;
   $('#killed').text(enemies.killed);
+  events.combat = false;
+  if (!events.hints.killed){
+    print(instr.examine, [2], 'gray');
+    events.hints.killed = true;
+  }
 }
 Enemy.prototype.examineDead = function(item, dropRate){
   var rando = Math.random();
@@ -32,9 +44,9 @@ Enemy.prototype.examineDead = function(item, dropRate){
 Enemy.prototype.escape = function(){
   var stam = +$('#stam').text();
   if (stam > 1){
+    events.combat = false;
     $('#stam').text(stam-2);
     pickLine(logs.escape[this.name]);
-    print(logs.escape[this.name], [99], 'logs');
     event('walk');
   }
   else {
@@ -49,7 +61,15 @@ var $jungle = $('#jungle');
 var $specs = $('#specs');
 var logs = {};
 var instr = {};
-var events = {tutorial: {}, visited: false, killed: false};
+var events = {tutorial: {},
+              hints: {
+                examine: false,
+                combat: false,
+                killed: false
+              },
+              visited: false, 
+              killed: false,
+              combat: false};
 var places = {list: []};
 var place;
 var weapons = {};
@@ -79,7 +99,7 @@ function pickElement(list){
 function pickBetween(a,b){
   return pickElement(range(a,b));
 }
-function pickLine(obj){
+function pickLine(obj, classes){
   var list = [];
   for (var prop in obj){
     if (prop <= 50){
@@ -87,10 +107,10 @@ function pickLine(obj){
     }
   }
   var i = [Number(pickElement(list))];
-  print(obj, i, 'logs');
+  classes ? print(obj, i, classes) : print(obj, i, 'logs');
 }
 
-logs.commands = ['commands/inv/char','examine/walk',
+logs.commands = ['commands/char','examine','walk',
     'escape']
 
 
@@ -181,7 +201,9 @@ logs.combat = {
       }
       else {
         foe.attack();
-        addLine('Enemy health: '+foe.health, 'combat');
+        if (+$('#health').text() > 0){
+          addLine('Enemy health: '+foe.health, 'combat');
+        }
       }
       var stam = +$('#stam').text();
       $('#stam').text(stam-1);
@@ -194,21 +216,24 @@ logs.combat = {
 }
 
 instr.examine = {
-  0: "Type \"examine\" to look around."
+  0: "Type \"examine\" to look around.",
+  1: "(Hint: examine the area)",
+  2: "(Hint: examine defeated enemies. Something may turn up!)"
 };
-instr.inventory = {
-  0: "Type \"inv\" to check your inventory."
-};
+// instr.inventory = {
+//   0: "Type \"inv\" to check your inventory."
+// };
 instr.commands = {
   0: "Type \"commands\" to view available commands."
 }
 instr.char = {
-  0: "Type \"char\" to view your stats."
+  0: "Type \"char\" to view your stats and items."
 }
 instr.walk = {
   0: "Type \"walk\" to explore a different area."
 }
 instr["Silver Dagger"] = {
   0: "Combat command learned: 'slash'",
+  1: "(Hint: use a combat command)",
   attack: 'slash'
 }
