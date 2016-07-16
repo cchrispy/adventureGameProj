@@ -5,20 +5,24 @@ function addLine(input, classes){
 function addInv(item){
   if (!logs.inv[item]){
     logs.inv[item] = 1;
+    $('<p>', {'id': item}).text('1 '+item).appendTo($('#inv'));
   }
   else {
     logs.inv[item]++;
+    var id = '#'+item;
+    $(id).text(logs.inv[item]+' '+item);
   }
-  $('<p>').text(item).appendTo($('#inv'));
 }
 
 function addWeapon(weapon, dmgRange){
   weapons[weapon] = dmgRange;
   addInv(weapon);
+  print(instr[weapon], [0], 'combat');
+  addCommand(instr[weapon].attack);
 }
 
 function addCommand(command){
-  if (logs.commands.indexOf(command) != -1){
+  if (logs.commands.indexOf(command) == -1){
     logs.commands.push(command);
     $('<p>').text(command).appendTo($('#commands'));
   }
@@ -75,6 +79,7 @@ function tutorial(input){
   else if (input == 'inv' && events.tutorial.examine){
     events.tutorial.complete = true;
     print(instr.commands, [0], 'gray');
+    print(instr.char, [0], 'gray');
     print(instr.walk, [0], 'gray');
     showSpecs(input);
   }
@@ -100,12 +105,26 @@ places.empty = {
     }
   }
 };
+places.item = {
+  arrival: function(){
+    pickLine(logs.arrival.item);
+  },
+  examine: function(){
+    if (!events.visited){
+      pickLine(logs.examine.item);
+      addInv('Food');
+      events.visited = true;
+    }
+    else {
+      print(logs.examine.empty, [99], 'logs');
+    }
+  }
+}
 places.wraith = {
   arrival: function(){
     print(logs.arrival.wraith, [0], 'enemy');
     enemies.wraith.health = pickBetween(4,10);
     enemies.wraith.dmg = pickBetween(1,1);
-    console.log(enemies.wraith.dmg);
     addLine('Enemy health: '+enemies.wraith.health, 'combat');
   },
   slash: function(){
@@ -173,13 +192,19 @@ function event(input){
     return;
   }
   else if (input == 'walk'){
+    addLine("You continue walking..", 'logs');
     place = pickElement(places.list);
     events.visited = false;
     events.killed = false;
     places[place].arrival();
   }
   else if (checkInput(input)){
-    places[place][input]();
+    if (input in places[place]){
+      places[place][input]();
+    }
+    else {
+      addLine("You cannot do that now.", 'error');
+    }
   }
   else {
     addLine('Error: unknown command.', 'error');

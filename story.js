@@ -6,13 +6,18 @@ Enemy.prototype.attack = function(){
   var str = "The " + this.name + " " + this.verb + " you and inflicts " +
             this.dmg + " damage.";
   addLine(str, 'error');
-  var health = +$('#health').text();
-  $('#health').text(health-this.dmg);
+  var health = +$('#health').text()-this.dmg;
+  $('#health').text(health);
+  if (health < 1){
+    addLine('You died. Game over.', 'error');
+  }
 }
 Enemy.prototype.died = function(){
   var str = "The " + this.name + " crumbles to the ground " +
             "in a pile of ash and dust.";
   addLine(str, 'combat');
+  enemies.killed++;
+  $('#killed').text(enemies.killed);
 }
 Enemy.prototype.examineDead = function(item, dropRate){
   var rando = Math.random();
@@ -50,7 +55,8 @@ var place;
 var weapons = {};
 var enemies = {
   wraith: new Enemy('wraith', 'strikes'),
-  ghoul: new Enemy('ghoul', 'lunges at')
+  ghoul: new Enemy('ghoul', 'lunges at'),
+  killed: 0
 };
 var inputs = ['examine','slash', 'escape'];
 
@@ -85,7 +91,7 @@ function pickLine(obj){
 }
 
 logs.commands = ['commands/inv/char','examine/walk',
-    'escape','slash']
+    'escape']
 
 
 // places: empty, wraith, ghoul, items, shop
@@ -118,9 +124,10 @@ logs.arrival.ghoul = {
   0: "A putrid smell fills the air. A creature snarls. " +
      "It rushes towards you."
 }
-logs.arrival.items = {
+logs.arrival.item = {
   0: "There is a shuffling near the ground. Something catches " +
-     "your attention."
+     "your attention.",
+  1: "Your foot catches something and you nearly trip."
 }
 logs.arrival.shop = {
   0: "You stumble upon a cloaked man. " + 
@@ -135,12 +142,19 @@ logs.examine.empty = {
   3: "You look around and find nothing interesting.",
   99: "You look around and find nothing interesting."
 }
+logs.examine.item = {
+  0: "A half-eaten piece of meat lies on the ground. You pick it up.",
+  1: "A candy bar hits you in the head. You hesitantly pocket it.",
+  2: "You find a muffin.",
+  3: "Something smells good. You look down and find some fried chicken."
+}
 logs.examine.ghoul = {
   0: "You feel weary and rest for a moment.",
   1: "You dig through the remains and find nothing.",
   2: "A gentle breeze blows the ashy remains away."
 }
 logs.examine.wraith = logs.examine.ghoul;
+
 logs.escape.ghoul = {
   0: "You sprint away from the area. Another time perhaps.",
   1: "You dodge your enemy and flee to a new area.",
@@ -193,4 +207,8 @@ instr.char = {
 }
 instr.walk = {
   0: "Type \"walk\" to explore a different area."
+}
+instr["Silver Dagger"] = {
+  0: "Combat command learned: 'slash'",
+  attack: 'slash'
 }

@@ -1,9 +1,9 @@
 $(document).ready(function(){
   addInv('Gold Key');
   logs.commands.forEach(function(command){
-    addCommand(command);
+    $('<p>').text(command).appendTo($('#commands'));
   })
-  places.list.push('empty','wraith','ghoul')
+  places.list.push('empty','empty','wraith','ghoul','item')
   $jungle.on('click', function(){
     $submit.focus();
   })
@@ -39,6 +39,11 @@ $(document).ready(function(){
         $line.first().next().css('opacity', '0.6');
         $line.first().next().next().css('opacity', '0.7');
         $line.first().next().next().next().css('opacity', '0.8');
+      }
+      if (input == 'godmode'){
+        events.tutorial.complete = true; // skip tut
+        addWeapon('Silver Dagger', range(6,8));
+        event('walk');
       }
       if (!events.tutorial.complete){
         tutorial(input);
