@@ -7,7 +7,7 @@ Enemy.prototype.attack = function(){
             this.dmg + " damage.";
   addLine(str, 'error');
   var health = +$('#health').text();
-  $('#health').text(health-1);
+  $('#health').text(health-this.dmg);
 }
 Enemy.prototype.died = function(){
   var str = "The " + this.name + " crumbles to the ground " +
@@ -24,6 +24,20 @@ Enemy.prototype.examineDead = function(item, dropRate){
     pickLine(logs.examine[this.name]);
   }
 }
+Enemy.prototype.escape = function(){
+  var stam = +$('#stam').text();
+  if (stam > 1){
+    $('#stam').text(stam-2);
+    pickLine(logs.escape[this.name]);
+    print(logs.escape[this.name], [99], 'logs');
+    event('walk');
+  }
+  else {
+    var str = "You don't have enough stamina to flee. " +
+              "You must fight!";
+    addLine(str, 'error');
+  }
+}
 
 var $submit = $('#submit');
 var $jungle = $('#jungle');
@@ -38,7 +52,7 @@ var enemies = {
   wraith: new Enemy('wraith', 'strikes'),
   ghoul: new Enemy('ghoul', 'lunges at')
 };
-var inputs = ['examine','slash'];
+var inputs = ['examine','slash', 'escape'];
 
 function range(a,b){
   var arr = [];
@@ -79,6 +93,7 @@ logs.commands = ['commands/inv/char','examine/walk',
 logs.inv = {};
 logs.arrival = {};
 logs.examine = {};
+logs.escape = {};
 
 logs.begin = {
   0: "Welcome traveller...",
@@ -126,6 +141,13 @@ logs.examine.ghoul = {
   2: "A gentle breeze blows the ashy remains away."
 }
 logs.examine.wraith = logs.examine.ghoul;
+logs.escape.ghoul = {
+  0: "You sprint away from the area. Another time perhaps.",
+  1: "You dodge your enemy and flee to a new area.",
+  2: "You jump away and run the other direction.",
+  99: "You continue walking..."
+}
+logs.escape.wraith = logs.escape.ghoul;
 logs.examine.Shard = {
   0: "You find a shard in the ashy remains."
 }
@@ -147,6 +169,8 @@ logs.combat = {
         foe.attack();
         addLine('Enemy health: '+foe.health, 'combat');
       }
+      var stam = +$('#stam').text();
+      $('#stam').text(stam-1);
     }
     else {
       var str = "You swing your " + weapon + " in victory.";
@@ -170,44 +194,3 @@ instr.char = {
 instr.walk = {
   0: "Type \"walk\" to explore a different area."
 }
-
-// places.empty = {
-//   arrival: function(){
-//     pickLine(logs.arrival.empty);
-//   },
-//   examine: function(){
-//     if (!visited) {
-//       pickLine(logs.examine.empty);
-//       visited = true;
-//     }
-//     else {
-//       print(logs.examine.empty, [99], 'logs');
-//     }
-//   }
-// };
-// places.wraith = {
-//   arrival: function(){
-//     print(logs.arrival.wraith, [0], 'enemy');
-//   },
-//   slash: function(){
-//     logs.combat.slash('wraith', 'Silver Dagger');
-//   }
-// };
-// places.ghoul = {
-//   arrival: function(){
-//     print(logs.arrival.ghoul, [0], 'enemy');
-//   },
-//   slash: function(){
-//     logs.combat.slash('ghoul', 'Silver Dagger');
-//   }
-// }
-// places.items = {
-//   arrival: function(){
-//     print(logs.arrival.items, [0], 'logs');
-//   }
-// };
-// places.shop = {
-//   arrival: function(){
-//     print(logs.arrival.shop, [0], 'logs');
-//   }
-// };

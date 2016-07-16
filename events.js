@@ -104,7 +104,8 @@ places.wraith = {
   arrival: function(){
     print(logs.arrival.wraith, [0], 'enemy');
     enemies.wraith.health = pickBetween(4,10);
-    enemies.wraith.dmg = range(1,1);
+    enemies.wraith.dmg = pickBetween(1,1);
+    console.log(enemies.wraith.dmg);
     addLine('Enemy health: '+enemies.wraith.health, 'combat');
   },
   slash: function(){
@@ -122,13 +123,16 @@ places.wraith = {
     else {
       print(logs.examine.empty, [99], 'logs');
     }
+  },
+  escape: function(){
+    enemies.wraith.escape();
   }
 };
 places.ghoul = {
   arrival: function(){
     print(logs.arrival.ghoul, [0], 'enemy');
     enemies.ghoul.health = pickBetween(4,8);
-    enemies.ghoul.dmg = range(1,1);
+    enemies.ghoul.dmg = pickBetween(1,1);
     addLine('Enemy health: '+enemies.ghoul.health, 'combat')
   },
   slash: function(){
@@ -147,6 +151,9 @@ places.ghoul = {
     else {
       print(logs.examine.empty, [99], 'logs');
     }
+  },
+  escape: function(){
+    enemies.ghoul.escape();
   }
 }
 places.items = {
